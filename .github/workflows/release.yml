@@ -8,6 +8,9 @@ name: Release
 on:
   push:
     branches: [main]
+  # Lets a maintainer start a fresh run from the Actions tab
+  # (re-running an old run keeps its original settings).
+  workflow_dispatch:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 

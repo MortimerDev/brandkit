@@ -1,8 +1,11 @@
 packages:
   - "packages/*"
 
-onlyBuiltDependencies:
-  - esbuild
-  - "@parcel/watcher"
-  - "@tailwindcss/oxide"
-  - lightningcss
+# Supply-chain hardening (pnpm equivalents of the .npmrc settings).
+# Only install versions published at least 7 days ago (minutes).
+minimumReleaseAge: 10080
+# Only direct dependencies may come from git or tarball URLs.
+blockExoticSubdeps: true
+# Dependency install scripts are blocked by default in pnpm 10; none are
+# allowed. esbuild, Tailwind and Lightning CSS ship prebuilt binaries.
+onlyBuiltDependencies: []

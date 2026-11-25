@@ -1,0 +1,129 @@
+/*
+ * @mortimerdev/brandkit-css reset: a small, modern "CSS starter".
+ *
+ * Not a heavy-handed reset: browsers agree on most defaults now, so this only
+ * sets a saner starting point. Ideas drawn from Kevin Powell's CSS
+ * Fundamentals starter, Andy Bell's "A (more) Modern CSS Reset" and Josh
+ * Comeau's "A Modern CSS Reset". Written for this package; MIT licensed.
+ */
+
+@layer reset {
+  /* Sizing includes padding and border. */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  /* Stop mobile browsers inflating text after orientation changes. */
+  html {
+    -moz-text-size-adjust: none;
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
+  }
+
+  body {
+    margin: 0;
+    min-block-size: 100vh;
+    min-block-size: 100dvh;
+    line-height: 1.5;
+  }
+
+  /* Remove default margins on text blocks; base.css adds rhythm back. */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  figure,
+  blockquote,
+  dl,
+  dd {
+    margin-block: 0;
+  }
+
+  /* Tighter line height and balanced wrapping for headings. */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+
+  /* Avoid single-word last lines in body copy. */
+  p,
+  li,
+  figcaption {
+    text-wrap: pretty;
+  }
+
+  /* Lists given a role keep semantics but lose bullets. */
+  ul[role="list"],
+  ol[role="list"] {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* Media behaves like blocks and never overflows its container. */
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    display: block;
+    max-inline-size: 100%;
+  }
+
+  img,
+  video {
+    block-size: auto;
+  }
+
+  /* Form controls use the page font instead of the browser's. */
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+    color: inherit;
+  }
+
+  /* Textareas without rows get a sensible minimum. */
+  textarea:not([rows]) {
+    min-block-size: 10em;
+  }
+
+  /* Long words and URLs wrap rather than overflow. */
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    overflow-wrap: break-word;
+  }
+
+  /* Anchored targets leave room above them. */
+  :target {
+    scroll-margin-block: 5ex;
+  }
+
+  /* Respect people who ask for less motion. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "name": "@mortimerdev/brandkit",
+  "version": "0.0.0",
+  "description": "Turn a few answers about your brand into an accessible design system: colours, type, spacing and exports for CSS, Tailwind, shadcn, Bootstrap, Vuetify and more.",
+  "license": "MIT",
+  "author": "Andy Mortimer (https://mortimer.dev)",
+  "homepage": "https://github.com/MortimerDev/brandkit#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MortimerDev/brandkit.git",
+    "directory": "packages/brandkit"
+  },
+  "bugs": "https://github.com/MortimerDev/brandkit/issues",
+  "keywords": [
+    "design-system",
+    "design-tokens",
+    "brand",
+    "color",
+    "oklch",
+    "contrast",
+    "accessibility",
+    "tailwind",
+    "shadcn",
+    "bootstrap",
+    "vuetify"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./css": {
+      "types": "./dist/exporters/css.d.ts",
+      "import": "./dist/exporters/css.js"
+    },
+    "./dtcg": {
+      "types": "./dist/exporters/dtcg.d.ts",
+      "import": "./dist/exporters/dtcg.js"
+    },
+    "./tailwind": {
+      "types": "./dist/exporters/tailwind.d.ts",
+      "import": "./dist/exporters/tailwind.js"
+    },
+    "./shadcn": {
+      "types": "./dist/exporters/shadcn.d.ts",
+      "import": "./dist/exporters/shadcn.js"
+    },
+    "./bootstrap": {
+      "types": "./dist/exporters/bootstrap.d.ts",
+      "import": "./dist/exporters/bootstrap.js"
+    },
+    "./vuetify": {
+      "types": "./dist/exporters/vuetify.d.ts",
+      "import": "./dist/exporters/vuetify.js"
+    },
+    "./design-md": {
+      "types": "./dist/exporters/design-md.d.ts",
+      "import": "./dist/exporters/design-md.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@tailwindcss/node": "^4.1.0",
+    "bootstrap": "^5.3.3",
+    "lightningcss": "^1.29.0",
+    "sass": "^1.85.0",
+    "tailwindcss": "^4.1.0",
+    "tsup": "^8.4.0",
+    "vitest": "^3.0.0"
+  }
+}

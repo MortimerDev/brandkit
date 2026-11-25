@@ -1,0 +1,53 @@
+{
+  "name": "@mortimerdev/brandkit-css",
+  "version": "0.0.0",
+  "description": "A small modern CSS reset, base styles and framework-free components driven by @mortimerdev/brandkit tokens. For projects with no UI library.",
+  "license": "MIT",
+  "author": "Andy Mortimer (https://mortimer.dev)",
+  "homepage": "https://github.com/MortimerDev/brandkit/tree/main/packages/brandkit-css#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MortimerDev/brandkit.git",
+    "directory": "packages/brandkit-css"
+  },
+  "bugs": "https://github.com/MortimerDev/brandkit/issues",
+  "keywords": [
+    "css",
+    "reset",
+    "css-reset",
+    "cascade-layers",
+    "design-tokens",
+    "brandkit"
+  ],
+  "type": "module",
+  "style": "./src/index.css",
+  "files": [
+    "src",
+    "dist"
+  ],
+  "exports": {
+    ".": "./src/index.css",
+    "./reset.css": "./src/reset.css",
+    "./base.css": "./src/base.css",
+    "./components.css": "./src/components.css",
+    "./bundle.css": "./dist/brandkit.min.css",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": [
+    "*.css"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "node scripts/bundle.mjs",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@mortimerdev/brandkit": "workspace:*",
+    "lightningcss": "^1.29.0",
+    "vitest": "^3.0.0"
+  }
+}

@@ -21,6 +21,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm format:check
-      - run: pnpm typecheck
+      # Build first: brandkit-css tests import the built brandkit package.
       - run: pnpm build
+      - run: pnpm typecheck
       - run: pnpm test

@@ -53,7 +53,7 @@ Every input except `name` is optional. See the [package README](packages/brandki
 
 ```sh
 pnpm install
-pnpm check   # lint, format, typecheck, build, test
+pnpm check   # lint, format, build, typecheck, test
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).

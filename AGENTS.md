@@ -7,7 +7,7 @@ pnpm monorepo, two packages:
 
 ## Commands
 
-- `pnpm check` runs lint, format check, typecheck, build and tests. Run it before finishing.
+- `pnpm check` runs lint, format check, build, typecheck and tests. Run it before finishing.
 - Tests use Vitest. Exporter tests compile real output with Tailwind v4, Sass + Bootstrap 5.3 and Lightning CSS.
 
 ## Rules

@@ -6,7 +6,7 @@ Thanks for helping. Issues and pull requests are welcome.
 
 ```sh
 pnpm install
-pnpm check   # lint, format check, typecheck, build, test
+pnpm check   # lint, format check, build, typecheck, test
 ```
 
 Node 20+ and pnpm 10 are required.

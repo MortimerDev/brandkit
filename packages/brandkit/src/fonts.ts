@@ -110,26 +110,28 @@ export function getFontPairing(id: string): FontPairing {
 }
 
 /**
- * Picks the pairing that best matches the personalities. Ties go to the more
- * specialised pairing (fewer tags), then to list order.
+ * All pairings, best match first. Earlier personalities count more; ties go
+ * to the more specialised pairing (fewer tags), then to list order.
  */
-export function pickFontPairing(personalities: Personality[]): FontPairing {
-  let best = FONT_PAIRINGS[0] as FontPairing;
-  let bestScore = -1;
-  for (const pairing of FONT_PAIRINGS) {
-    const score = personalities.reduce(
-      // Earlier personalities in the answer count more.
+export function rankFontPairings(personalities: Personality[]): FontPairing[] {
+  const score = (pairing: FontPairing) =>
+    personalities.reduce(
       (sum, p, i) => sum + (pairing.personalities.includes(p) ? personalities.length - i : 0),
       0,
     );
-    const tieBreak =
-      score === bestScore && pairing.personalities.length < best.personalities.length;
-    if (score > bestScore || tieBreak) {
-      best = pairing;
-      bestScore = score;
-    }
-  }
-  return best;
+  return FONT_PAIRINGS.map((pairing, index) => ({ pairing, index, score: score(pairing) }))
+    .sort(
+      (a, b) =>
+        b.score - a.score ||
+        a.pairing.personalities.length - b.pairing.personalities.length ||
+        a.index - b.index,
+    )
+    .map((r) => r.pairing);
+}
+
+/** The pairing that best matches the personalities. */
+export function pickFontPairing(personalities: Personality[]): FontPairing {
+  return rankFontPairings(personalities)[0] as FontPairing;
 }
 
 export function fontStack(family: FontFamily): string {

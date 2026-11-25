@@ -24,6 +24,7 @@ export {
   getFontPairing,
   googleFontsUrl,
   pickFontPairing,
+  rankFontPairings,
 } from "./fonts.js";
 export {
   type GeneratedScale,

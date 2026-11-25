@@ -1,0 +1,183 @@
+/*
+ * @mortimerdev/brandkit-css components: a few framework-free building blocks.
+ * Class names are prefixed .bk- to stay out of the way of your own CSS.
+ */
+
+@layer components {
+  /* Space out stacked blocks. */
+  :where(.bk-card, .bk-alert, .bk-nav) + :where(.bk-card, .bk-alert, .bk-nav) {
+    margin-block-start: var(--bk-space-4, 1rem);
+  }
+
+  /* Buttons */
+  .bk-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--bk-space-2, 0.5rem);
+    min-block-size: 2.5rem;
+    padding: var(--bk-space-2, 0.5rem) var(--bk-space-4, 1rem);
+    border: 1px solid transparent;
+    border-radius: var(--bk-radius-md, 0.375rem);
+    background-color: var(--bk-primary, #2563eb);
+    color: var(--bk-primary-foreground, #ffffff);
+    font-weight: var(--bk-weight-semibold, 600);
+    line-height: 1.25;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease,
+      box-shadow 150ms ease;
+  }
+
+  .bk-button:hover {
+    background-color: var(--bk-primary-hover, #1d4ed8);
+  }
+
+  .bk-button:disabled,
+  .bk-button[aria-disabled="true"] {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .bk-button--secondary {
+    background-color: var(--bk-secondary, #f3f4f6);
+    color: var(--bk-secondary-foreground, #111111);
+    border-color: var(--bk-border, #e5e7eb);
+  }
+
+  .bk-button--secondary:hover {
+    background-color: var(--bk-muted, #e5e7eb);
+  }
+
+  .bk-button--ghost {
+    background-color: transparent;
+    color: var(--bk-foreground, #111111);
+  }
+
+  .bk-button--ghost:hover {
+    background-color: var(--bk-muted, #f3f4f6);
+  }
+
+  .bk-button--danger {
+    background-color: var(--bk-danger, #dc2626);
+    color: var(--bk-danger-foreground, #ffffff);
+  }
+
+  .bk-button--danger:hover {
+    filter: brightness(0.92);
+  }
+
+  /* Form fields */
+  .bk-label {
+    display: block;
+    margin-block-end: var(--bk-space-1, 0.25rem);
+    font-weight: var(--bk-weight-semibold, 600);
+    font-size: var(--bk-text-sm, 0.875rem);
+  }
+
+  .bk-input {
+    display: block;
+    inline-size: 100%;
+    min-block-size: 2.5rem;
+    padding: var(--bk-space-2, 0.5rem) var(--bk-space-3, 0.75rem);
+    border: 1px solid var(--bk-input, #6b7280);
+    border-radius: var(--bk-radius-md, 0.375rem);
+    background-color: var(--bk-background, #ffffff);
+    color: var(--bk-foreground, #111111);
+  }
+
+  .bk-input::placeholder {
+    color: var(--bk-muted-foreground, #4b5563);
+    opacity: 1;
+  }
+
+  .bk-input:focus-visible {
+    outline: 2px solid var(--bk-ring, #2563eb);
+    outline-offset: 1px;
+    border-color: var(--bk-ring, #2563eb);
+  }
+
+  .bk-input[aria-invalid="true"] {
+    border-color: var(--bk-danger, #dc2626);
+  }
+
+  .bk-hint {
+    margin-block-start: var(--bk-space-1, 0.25rem);
+    font-size: var(--bk-text-sm, 0.875rem);
+    color: var(--bk-muted-foreground, #4b5563);
+  }
+
+  /* Card */
+  .bk-card {
+    padding: var(--bk-space-6, 1.5rem);
+    border: 1px solid var(--bk-border, #e5e7eb);
+    border-radius: var(--bk-radius-lg, 0.625rem);
+    background-color: var(--bk-surface, #f9fafb);
+    color: var(--bk-surface-foreground, #111111);
+    box-shadow: var(--bk-shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.06));
+  }
+
+  /* Navigation */
+  .bk-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--bk-space-1, 0.25rem);
+  }
+
+  .bk-nav a {
+    padding: var(--bk-space-2, 0.5rem) var(--bk-space-3, 0.75rem);
+    border-radius: var(--bk-radius-md, 0.375rem);
+    color: var(--bk-foreground, #111111);
+    text-decoration: none;
+  }
+
+  .bk-nav a:hover {
+    background-color: var(--bk-muted, #f3f4f6);
+  }
+
+  .bk-nav a[aria-current="page"] {
+    background-color: var(--bk-secondary, #f3f4f6);
+    font-weight: var(--bk-weight-semibold, 600);
+  }
+
+  /* Badge */
+  .bk-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem var(--bk-space-2, 0.5rem);
+    border-radius: var(--bk-radius-full, 9999px);
+    background-color: var(--bk-accent-subtle, #eef2ff);
+    color: var(--bk-accent-subtle-foreground, #3730a3);
+    font-size: var(--bk-text-xs, 0.75rem);
+    font-weight: var(--bk-weight-semibold, 600);
+  }
+
+  /* Alerts: add --success, --warning, --danger or --info */
+  .bk-alert {
+    --_bg: var(--bk-info-subtle, #eff6ff);
+    --_fg: var(--bk-info-subtle-foreground, #1e3a8a);
+    padding: var(--bk-space-4, 1rem);
+    border-radius: var(--bk-radius-md, 0.375rem);
+    border-inline-start: 4px solid currentColor;
+    background-color: var(--_bg);
+    color: var(--_fg);
+  }
+
+  .bk-alert--success {
+    --_bg: var(--bk-success-subtle, #f0fdf4);
+    --_fg: var(--bk-success-subtle-foreground, #14532d);
+  }
+
+  .bk-alert--warning {
+    --_bg: var(--bk-warning-subtle, #fffbeb);
+    --_fg: var(--bk-warning-subtle-foreground, #78350f);
+  }
+
+  .bk-alert--danger {
+    --_bg: var(--bk-danger-subtle, #fef2f2);
+    --_fg: var(--bk-danger-subtle-foreground, #7f1d1d);
+  }
+}

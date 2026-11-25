@@ -1,0 +1,13 @@
+/*
+ * @mortimerdev/brandkit-css: reset, base styles and components in cascade
+ * layers, so your own unlayered CSS always wins.
+ *
+ * Load your brand tokens (from @mortimerdev/brandkit's CSS export) as well;
+ * put them in the `tokens` layer or leave them unlayered.
+ */
+
+@layer reset, tokens, base, components;
+
+@import "./reset.css";
+@import "./base.css";
+@import "./components.css";

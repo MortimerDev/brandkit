@@ -1,6 +1,6 @@
 {
   "name": "@mortimerdev/brandkit",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Turn a few answers about your brand into an accessible design system: colours, type, spacing and exports for CSS, Tailwind, shadcn, Bootstrap, Vuetify and more.",
   "license": "MIT",
   "author": "Andy Mortimer (https://mortimer.dev)",

@@ -1,6 +1,6 @@
 {
   "name": "@mortimerdev/brandkit-css",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "A small modern CSS reset, base styles and framework-free components driven by @mortimerdev/brandkit tokens. For projects with no UI library.",
   "license": "MIT",
   "author": "Andy Mortimer (https://mortimer.dev)",

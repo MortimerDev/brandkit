@@ -124,6 +124,13 @@ export interface Brandkit {
     accentStrategy: AccentStrategy;
     /** Step holding the exact colour the user supplied, if any. */
     primaryBaseStep: ScaleStep | null;
+    /** Where each choice came from: the user's input or the personality. */
+    sources: {
+      primary: "input" | "personality";
+      accent: "input" | "derived";
+      roundness: "input" | "personality";
+      fontPairing: "input" | "personality";
+    };
   };
   scales: Record<ScaleName, Scale>;
   semantic: { light: SemanticColors; dark: SemanticColors };

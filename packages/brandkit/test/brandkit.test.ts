@@ -118,9 +118,57 @@ describe("createBrandkit", () => {
 
   it("builds a modular type scale from the personality", () => {
     const kit = createBrandkit({ name: "Bold", personality: ["bold"] });
-    expect(kit.typography.ratio).toBe(1.333);
+    expect(kit.typography.ratio).toBe(1.414);
     expect(kit.typography.scale.base.size).toBe("1rem");
-    expect(parseFloat(kit.typography.scale["2xl"].size)).toBeCloseTo(1.333 ** 3, 2);
+    expect(parseFloat(kit.typography.scale["2xl"].size)).toBeCloseTo(1.414 ** 3, 2);
+  });
+
+  it("makes every personality visibly different, even with the user's own colour", () => {
+    const signature = (p: (typeof PERSONALITIES)[number]) => {
+      const kit = createBrandkit({ name: "P", primary: "#2f6b3b", personality: [p] });
+      return [kit.typography.pairing.id, kit.meta.roundness, kit.typography.ratio].join("|");
+    };
+    const signatures = PERSONALITIES.map(signature);
+    expect(new Set(signatures).size).toBe(PERSONALITIES.length);
+    // Calm used to be identical to Professional and to picking nothing.
+    const none = createBrandkit({ name: "P", primary: "#2f6b3b" });
+    expect(signature("calm")).not.toBe(
+      [none.typography.pairing.id, none.meta.roundness, none.typography.ratio].join("|"),
+    );
+  });
+
+  it("lets secondary personalities influence the result", () => {
+    const alone = createBrandkit({ name: "P", personality: ["professional"] });
+    const mixed = createBrandkit({
+      name: "P",
+      personality: ["professional", "playful", "friendly"],
+    });
+    // Two of three votes are for round corners, and the type scale blends.
+    expect(alone.meta.roundness).toBe("soft");
+    expect(mixed.meta.roundness).toBe("round");
+    expect(mixed.typography.ratio).toBeGreaterThan(alone.typography.ratio);
+  });
+
+  it("records where each choice came from", () => {
+    expect(createBrandkit({ name: "P" }).meta.sources).toEqual({
+      primary: "personality",
+      accent: "derived",
+      roundness: "personality",
+      fontPairing: "personality",
+    });
+    const own = createBrandkit({
+      name: "P",
+      primary: "#123456",
+      accent: "#f59e0b",
+      roundness: "sharp",
+      fontPairing: "inter",
+    });
+    expect(own.meta.sources).toEqual({
+      primary: "input",
+      accent: "input",
+      roundness: "input",
+      fontPairing: "input",
+    });
   });
 
   it("maps roundness to radii", () => {

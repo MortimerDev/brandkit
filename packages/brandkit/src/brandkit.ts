@@ -40,38 +40,113 @@ export const PERSONALITY_COLORS: Record<Personality, string> = {
   luxurious: "#6d28d9",
 };
 
-const DEFAULT_ACCENT_STRATEGY: Record<Personality, AccentStrategy> = {
-  professional: "analogous",
-  friendly: "triadic",
-  playful: "triadic",
-  calm: "analogous",
-  bold: "complementary",
-  technical: "split",
-  warm: "analogous",
-  luxurious: "complementary",
+interface PersonalityTraits {
+  roundness: Roundness;
+  /** Modular type-scale ratio. */
+  typeRatio: number;
+  /** Chroma of the tinted neutrals (0 = pure grey). */
+  neutralTint: number;
+  accentStrategy: AccentStrategy;
+  /** Multiplier for the chroma of a derived second colour. */
+  accentChroma: number;
+}
+
+/**
+ * What each personality changes. Every row differs from the others in at
+ * least two visible ways, so picking a personality always shows up in the
+ * kit even when the user supplies their own colour. Fonts are chosen
+ * separately in fonts.ts.
+ */
+export const PERSONALITY_TRAITS: Record<Personality, PersonalityTraits> = {
+  professional: {
+    roundness: "soft",
+    typeRatio: 1.2,
+    neutralTint: 0.006,
+    accentStrategy: "analogous",
+    accentChroma: 0.9,
+  },
+  friendly: {
+    roundness: "round",
+    typeRatio: 1.25,
+    neutralTint: 0.012,
+    accentStrategy: "triadic",
+    accentChroma: 1,
+  },
+  playful: {
+    roundness: "round",
+    typeRatio: 1.3,
+    neutralTint: 0.014,
+    accentStrategy: "triadic",
+    accentChroma: 1.25,
+  },
+  calm: {
+    roundness: "round",
+    typeRatio: 1.15,
+    neutralTint: 0.018,
+    accentStrategy: "analogous",
+    accentChroma: 0.6,
+  },
+  bold: {
+    roundness: "sharp",
+    typeRatio: 1.414,
+    neutralTint: 0.004,
+    accentStrategy: "complementary",
+    accentChroma: 1.25,
+  },
+  technical: {
+    roundness: "sharp",
+    typeRatio: 1.2,
+    neutralTint: 0.004,
+    accentStrategy: "split",
+    accentChroma: 1,
+  },
+  warm: {
+    roundness: "round",
+    typeRatio: 1.25,
+    neutralTint: 0.02,
+    accentStrategy: "analogous",
+    accentChroma: 0.9,
+  },
+  luxurious: {
+    roundness: "sharp",
+    typeRatio: 1.333,
+    neutralTint: 0.008,
+    accentStrategy: "complementary",
+    accentChroma: 0.75,
+  },
 };
 
-const DEFAULT_ROUNDNESS: Record<Personality, Roundness> = {
-  professional: "soft",
-  friendly: "round",
-  playful: "round",
-  calm: "soft",
-  bold: "sharp",
-  technical: "sharp",
-  warm: "round",
-  luxurious: "sharp",
-};
+/**
+ * Weights for personalities in order of importance. The first counts most,
+ * but the second and third together can outvote it.
+ */
+const WEIGHTS = [2, 1.5, 1];
+function weights(personality: Personality[]): [Personality, number][] {
+  return personality.map((p, i) => [p, WEIGHTS[i] ?? 1]);
+}
 
-const TYPE_RATIO: Record<Personality, number> = {
-  professional: 1.2,
-  friendly: 1.25,
-  playful: 1.25,
-  calm: 1.2,
-  bold: 1.333,
-  technical: 1.2,
-  warm: 1.25,
-  luxurious: 1.333,
-};
+/** Weighted average of a numeric trait across all chosen personalities. */
+function blend(personality: Personality[], pick: (t: PersonalityTraits) => number): number {
+  let sum = 0;
+  let total = 0;
+  for (const [p, w] of weights(personality)) {
+    sum += pick(PERSONALITY_TRAITS[p]) * w;
+    total += w;
+  }
+  return sum / total;
+}
+
+/** Weighted vote for a categorical trait; ties go to the most important personality. */
+function vote<T extends string>(personality: Personality[], pick: (t: PersonalityTraits) => T): T {
+  const tally = new Map<T, number>();
+  for (const [p, w] of weights(personality)) {
+    const value = pick(PERSONALITY_TRAITS[p]);
+    tally.set(value, (tally.get(value) ?? 0) + w);
+  }
+  let best = pick(PERSONALITY_TRAITS[personality[0] as Personality]);
+  for (const [value, score] of tally) if (score > (tally.get(best) ?? 0)) best = value;
+  return best;
+}
 
 const ACCENT_ROTATION: Record<AccentStrategy, number> = {
   analogous: 40,
@@ -306,7 +381,7 @@ function buildTypography(input: BrandkitInput, personality: Personality[]): Typo
   const pairing = input.fontPairing
     ? getFontPairing(input.fontPairing)
     : pickFontPairing(personality);
-  const ratio = TYPE_RATIO[personality[0] ?? "professional"];
+  const ratio = Math.round(blend(personality, (t) => t.typeRatio) * 1000) / 1000;
   const scale = {} as Typography["scale"];
   for (const [name, power] of TYPE_STEPS) {
     const rem = Math.round(ratio ** power * 1000) / 1000;
@@ -370,18 +445,26 @@ export function createBrandkit(input: BrandkitInput): Brandkit {
     ? input.personality
     : ["professional"];
   const lead = personality[0] as Personality;
-  const accentStrategy = input.accentStrategy ?? DEFAULT_ACCENT_STRATEGY[lead];
-  const roundness = input.roundness ?? DEFAULT_ROUNDNESS[lead];
+  const accentStrategy = input.accentStrategy ?? PERSONALITY_TRAITS[lead].accentStrategy;
+  const roundness = input.roundness ?? vote(personality, (t) => t.roundness);
 
   const primaryColor = fromHex(input.primary ?? PERSONALITY_COLORS[lead]);
   const primary = generateScale(primaryColor, { keepBase: input.primary !== undefined });
 
   const accentColor = input.accent
     ? fromHex(input.accent)
-    : rotateHue(primaryColor, ACCENT_ROTATION[accentStrategy], Math.max(primaryColor.oklch.c, 0.1));
+    : rotateHue(
+        primaryColor,
+        ACCENT_ROTATION[accentStrategy],
+        Math.max(primaryColor.oklch.c, 0.1) * blend(personality, (t) => t.accentChroma),
+      );
   const accent = generateScale(accentColor, { keepBase: input.accent !== undefined });
 
-  const tint = Math.min(input.neutralTint ?? 0.01, 0.03, primaryColor.oklch.c);
+  const tint = Math.min(
+    input.neutralTint ?? blend(personality, (t) => t.neutralTint),
+    0.03,
+    primaryColor.oklch.c,
+  );
   const status = (h: number) =>
     generateScale(fromOklch({ l: 0.62, c: 0.17, h }), { keepBase: false }).scale;
 
@@ -410,6 +493,12 @@ export function createBrandkit(input: BrandkitInput): Brandkit {
       roundness,
       accentStrategy,
       primaryBaseStep: primary.baseStep,
+      sources: {
+        primary: input.primary ? "input" : "personality",
+        accent: input.accent ? "input" : "derived",
+        roundness: input.roundness ? "input" : "personality",
+        fontPairing: input.fontPairing ? "input" : "personality",
+      },
     },
     scales,
     semantic,

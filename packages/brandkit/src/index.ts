@@ -1,4 +1,9 @@
-export { createBrandkit, checkContrast, PERSONALITY_COLORS } from "./brandkit.js";
+export {
+  createBrandkit,
+  checkContrast,
+  PERSONALITY_COLORS,
+  PERSONALITY_TRAITS,
+} from "./brandkit.js";
 export {
   type Color,
   type Oklch,

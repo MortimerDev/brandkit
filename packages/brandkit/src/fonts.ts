@@ -40,7 +40,7 @@ export const FONT_PAIRINGS: FontPairing[] = [
     heading: f("Inter", SANS),
     body: f("Inter", SANS),
     mono: f("JetBrains Mono", MONO, [400, 600]),
-    personalities: ["professional", "technical", "calm"],
+    personalities: ["professional", "technical"],
   },
   {
     id: "space-grotesk",
@@ -64,7 +64,7 @@ export const FONT_PAIRINGS: FontPairing[] = [
     heading: f("Fraunces", SERIF, [600, 700]),
     body: f("Inter", SANS),
     mono: f("JetBrains Mono", MONO, [400, 600]),
-    personalities: ["warm", "luxurious", "calm"],
+    personalities: ["warm", "luxurious"],
   },
   {
     id: "playfair",
@@ -80,7 +80,7 @@ export const FONT_PAIRINGS: FontPairing[] = [
     heading: f("Nunito", SANS, [700, 800]),
     body: f("Nunito Sans", SANS),
     mono: f("JetBrains Mono", MONO, [400, 600]),
-    personalities: ["friendly", "playful", "warm"],
+    personalities: ["friendly", "warm"],
   },
   {
     id: "outfit",
@@ -88,7 +88,7 @@ export const FONT_PAIRINGS: FontPairing[] = [
     heading: f("Outfit", SANS, [600, 700]),
     body: f("DM Sans", SANS),
     mono: f("JetBrains Mono", MONO, [400, 600]),
-    personalities: ["bold", "playful", "friendly"],
+    personalities: ["playful", "bold"],
   },
   {
     id: "manrope",
@@ -96,7 +96,7 @@ export const FONT_PAIRINGS: FontPairing[] = [
     heading: f("Manrope", SANS, [600, 800]),
     body: f("Source Serif 4", SERIF, [400, 600]),
     mono: f("IBM Plex Mono", MONO, [400, 600]),
-    personalities: ["calm", "professional", "warm"],
+    personalities: ["calm"],
   },
 ];
 

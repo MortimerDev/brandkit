@@ -171,6 +171,71 @@ describe("createBrandkit", () => {
     });
   });
 
+  describe("shuffle (seed)", () => {
+    const sig = (kit: ReturnType<typeof createBrandkit>) =>
+      [kit.scales.primary[500].hex, kit.semantic.light.accent.hex, kit.typography.pairing.id].join(
+        "|",
+      );
+
+    it("is deterministic and leaves seed 0 as the default", () => {
+      const base = { name: "S", personality: ["calm" as const] };
+      expect(sig(createBrandkit({ ...base, seed: 7 }))).toBe(
+        sig(createBrandkit({ ...base, seed: 7 })),
+      );
+      expect(sig(createBrandkit({ ...base, seed: 0 }))).toBe(sig(createBrandkit(base)));
+      expect(createBrandkit({ ...base, seed: 7 }).meta.seed).toBe(7);
+      expect(createBrandkit({ ...base, seed: -3 }).meta.seed).toBe(0);
+    });
+
+    it("produces variety across seeds", () => {
+      const results = new Set(
+        Array.from({ length: 12 }, (_, i) => sig(createBrandkit({ name: "S", seed: i + 1 }))),
+      );
+      expect(results.size).toBeGreaterThanOrEqual(8);
+    });
+
+    it("never changes choices the user fixed", () => {
+      for (let seed = 1; seed <= 20; seed++) {
+        const kit = createBrandkit({
+          name: "S",
+          primary: "#2f6b3b",
+          accent: "#f59e0b",
+          fontPairing: "playfair",
+          roundness: "sharp",
+          seed,
+        });
+        expect(kit.semantic.light.primary.hex).toBe("#2f6b3b");
+        expect(Object.values(kit.scales.accent).map((c) => c.hex)).toContain("#f59e0b");
+        expect(kit.typography.pairing.id).toBe("playfair");
+        expect(kit.meta.roundness).toBe("sharp");
+      }
+    });
+
+    it("keeps an unfixed choice stable when another choice is fixed", () => {
+      const free = createBrandkit({ name: "S", personality: ["warm"], seed: 11 });
+      const fixedColour = createBrandkit({
+        name: "S",
+        personality: ["warm"],
+        primary: free.scales.primary[free.meta.primaryBaseStep ?? 600].hex,
+        seed: 11,
+      });
+      expect(fixedColour.typography.pairing.id).toBe(free.typography.pairing.id);
+    });
+
+    it("keeps contrast guarantees for shuffled kits", () => {
+      for (let seed = 1; seed <= 60; seed++) {
+        const personality = [
+          PERSONALITIES[seed % PERSONALITIES.length] as (typeof PERSONALITIES)[number],
+        ];
+        const kit = createBrandkit({ name: "S", personality, seed });
+        expect(
+          kit.contrast.filter((c) => !c.aa),
+          `seed ${seed}`,
+        ).toEqual([]);
+      }
+    });
+  });
+
   it("maps roundness to radii", () => {
     expect(createBrandkit({ name: "A", roundness: "sharp" }).radius.md).toBe("0.25rem");
     expect(createBrandkit({ name: "A", roundness: "round" }).radius.lg).toBe("1rem");

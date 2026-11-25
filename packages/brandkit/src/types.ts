@@ -33,6 +33,12 @@ export interface BrandkitInput {
   fontPairing?: string;
   /** Neutral tint chroma, 0 (pure grey) to ~0.03. */
   neutralTint?: number;
+  /**
+   * Shuffle: a positive integer that varies every choice not given above
+   * (suggested colour, second colour, fonts). The same seed always gives the
+   * same kit. 0 or omitted gives the default for the personality.
+   */
+  seed?: number;
 }
 
 export type ScaleName =
@@ -124,6 +130,8 @@ export interface Brandkit {
     accentStrategy: AccentStrategy;
     /** Step holding the exact colour the user supplied, if any. */
     primaryBaseStep: ScaleStep | null;
+    /** Shuffle seed used (0 = none). */
+    seed: number;
     /** Where each choice came from: the user's input or the personality. */
     sources: {
       primary: "input" | "personality";

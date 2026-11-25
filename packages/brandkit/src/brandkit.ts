@@ -1,5 +1,5 @@
 import { type Color, contrastRatio, fromHex, fromOklch, isHex, parseHex } from "./color.js";
-import { fontStack, getFontPairing, googleFontsUrl, pickFontPairing } from "./fonts.js";
+import { fontStack, getFontPairing, googleFontsUrl, rankFontPairings } from "./fonts.js";
 import {
   type Scale,
   type ScaleStep,
@@ -146,6 +146,18 @@ function vote<T extends string>(personality: Personality[], pick: (t: Personalit
   let best = pick(PERSONALITY_TRAITS[personality[0] as Personality]);
   for (const [value, score] of tally) if (score > (tally.get(best) ?? 0)) best = value;
   return best;
+}
+
+/** Small deterministic PRNG (mulberry32) so a seed always gives the same kit. */
+function random(seed: number): () => number {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
 }
 
 const ACCENT_ROTATION: Record<AccentStrategy, number> = {
@@ -377,10 +389,19 @@ const TYPE_STEPS: [TypeScaleName, number][] = [
   ["5xl", 6],
 ];
 
-function buildTypography(input: BrandkitInput, personality: Personality[]): Typography {
+function buildTypography(
+  input: BrandkitInput,
+  personality: Personality[],
+  roll: (salt: number) => (() => number) | null,
+): Typography {
+  const ranked = rankFontPairings(personality);
+  const fontRoll = roll(3);
+  // A shuffle picks among the three best matches for the personality.
   const pairing = input.fontPairing
     ? getFontPairing(input.fontPairing)
-    : pickFontPairing(personality);
+    : fontRoll
+      ? (ranked[Math.floor(fontRoll() * Math.min(3, ranked.length))] as (typeof ranked)[number])
+      : (ranked[0] as (typeof ranked)[number]);
   const ratio = Math.round(blend(personality, (t) => t.typeRatio) * 1000) / 1000;
   const scale = {} as Typography["scale"];
   for (const [name, power] of TYPE_STEPS) {
@@ -445,17 +466,35 @@ export function createBrandkit(input: BrandkitInput): Brandkit {
     ? input.personality
     : ["professional"];
   const lead = personality[0] as Personality;
-  const accentStrategy = input.accentStrategy ?? PERSONALITY_TRAITS[lead].accentStrategy;
+  const seed =
+    Number.isInteger(input.seed) && (input.seed as number) > 0 ? (input.seed as number) : 0;
+  // Each shuffled choice has its own stream, so fixing one leaves the others
+  // exactly as they were for the same seed.
+  const roll = (salt: number) => (seed ? random(seed * 7919 + salt) : null);
+
+  const strategyRoll = roll(2);
+  const strategies = Object.keys(ACCENT_ROTATION) as AccentStrategy[];
+  const accentStrategy =
+    input.accentStrategy ??
+    (strategyRoll && strategyRoll() >= 0.5
+      ? (strategies[Math.floor(strategyRoll() * strategies.length)] as AccentStrategy)
+      : PERSONALITY_TRAITS[lead].accentStrategy);
   const roundness = input.roundness ?? vote(personality, (t) => t.roundness);
 
-  const primaryColor = fromHex(input.primary ?? PERSONALITY_COLORS[lead]);
+  let primaryColor = fromHex(input.primary ?? PERSONALITY_COLORS[lead]);
+  const primaryRoll = roll(1);
+  if (!input.primary && primaryRoll) {
+    // Shuffle the suggested colour's hue by up to 40 degrees either way.
+    primaryColor = rotateHue(primaryColor, (primaryRoll() * 2 - 1) * 40);
+  }
   const primary = generateScale(primaryColor, { keepBase: input.primary !== undefined });
 
+  const hueRoll = roll(4);
   const accentColor = input.accent
     ? fromHex(input.accent)
     : rotateHue(
         primaryColor,
-        ACCENT_ROTATION[accentStrategy],
+        ACCENT_ROTATION[accentStrategy] + (hueRoll ? (hueRoll() * 2 - 1) * 15 : 0),
         Math.max(primaryColor.oklch.c, 0.1) * blend(personality, (t) => t.accentChroma),
       );
   const accent = generateScale(accentColor, { keepBase: input.accent !== undefined });
@@ -493,6 +532,7 @@ export function createBrandkit(input: BrandkitInput): Brandkit {
       roundness,
       accentStrategy,
       primaryBaseStep: primary.baseStep,
+      seed,
       sources: {
         primary: input.primary ? "input" : "personality",
         accent: input.accent ? "input" : "derived",
@@ -502,7 +542,7 @@ export function createBrandkit(input: BrandkitInput): Brandkit {
     },
     scales,
     semantic,
-    typography: buildTypography(input, personality),
+    typography: buildTypography(input, personality, roll),
     spacing: buildSpacing(),
     radius: RADIUS[roundness],
     shadow: buildShadows(scales.neutral),
